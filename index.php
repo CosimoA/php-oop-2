@@ -42,10 +42,27 @@
 
 <body>
 
+
     <?php
+
+    trait PrezzoTrait
+    {
+        public function verificaPrezzo($prezzo)
+        {
+            if ($prezzo < 0) {
+                throw new PrezzoNonValidoException("Il prezzo non può essere negativo");
+            }
+        }
+    }
+
+    class PrezzoNonValidoException extends Exception
+    {
+    }
 
     class Prodotto
     {
+        use PrezzoTrait;
+
         public $immagine;
         public $titolo;
         public $prezzo;
@@ -102,13 +119,17 @@
     $categoriaCani = new Categoria('Cani');
     $categoriaGatti = new Categoria('Gatti');
 
-    $dentalSnack = new Prodotto('next-dental-stick-mini-7pz.jpg', 'Next Dog Dental Stick 7 Pezzi', 10.99, 'Cani', 'cibo');
-    $branchToy = new Prodotto('branch-rametto-in-gomma-beige.jpg', 'Mr. Branch Rametto in Gomma', 15.99, 'Cani', 'gioco');
-    $lodgeHouse = new Prodotto('eco-lodge.jpg', 'Cuccia per Cani Eco Lodge', 249.99, 'Cani', 'cuccia');
+    try {
+        $dentalSnack = new Prodotto('next-dental-stick-mini-7pz.jpg', 'Next Dog Dental Stick 7 Pezzi', 10.99, 'Cani', 'cibo');
+        $branchToy = new Prodotto('branch-rametto-in-gomma-beige.jpg', 'Mr. Branch Rametto in Gomma', 15.99, 'Cani', 'gioco');
+        $lodgeHouse = new Prodotto('eco-lodge.jpg', 'Cuccia per Cani Eco Lodge', 249.99, 'Cani', 'cuccia');
 
-    $catisfactionSnack = new Prodotto('catisfaction.jpg', 'Catisfactions Snack Gatto', 8.99, 'Gatti', 'cibo');
-    $catnipToy = new Prodotto('CATNIP.jpg', 'Euphoria Palla Catnip', 12.99, 'Gatti', 'gioco');
-    $cucciaGatto = new Prodotto('36357.jpg', 'Cuccia Igloo Livia', 46.99, 'Gatti', 'cuccia');
+        $catisfactionSnack = new Prodotto('catisfaction.jpg', 'Catisfactions Snack Gatto', 0, 'Gatti', 'cibo');
+        $catnipToy = new Prodotto('CATNIP.jpg', 'Euphoria Palla Catnip', 12.99, 'Gatti', 'gioco');
+        $cucciaGatto = new Prodotto('36357.jpg', 'Cuccia Igloo Livia', 46.99, 'Gatti', 'cuccia');
+    } catch (PrezzoNonValidoException $e) {
+        echo "Errore: " . $e->getMessage();
+    }
 
     // Creazione dello shop e aggiunta di categorie e prodotti
     $shop = new Shop();
@@ -133,11 +154,22 @@
             echo "Prezzo: {$prodotto->prezzo}€<br>";
             echo "Categoria: {$prodotto->categoria}<br>";
             echo "Tipo: {$prodotto->tipo}<br>";
+            echo "<button onclick='acquista({$prodotto->prezzo})'>Acquista</button>";
             echo "</div>";
         }
     }
+
     ?>
 
+    <script>
+        function acquista(prezzo) {
+            if (prezzo <= 0) {
+                alert('Prodotto non acquistabile.');
+            } else {
+                alert('Prodotto acquistato!');
+            }
+        }
+    </script>
 </body>
 
 </html>
